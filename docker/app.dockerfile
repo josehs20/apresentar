@@ -1,6 +1,8 @@
-FROM php:8.4-fpm-alpine
+FROM php:8.2-fpm-alpine
 
+# Instala dependências
 RUN apk add --no-cache \
+    nginx \
     bash \
     curl \
     git \
@@ -13,19 +15,39 @@ RUN apk add --no-cache \
     sqlite-dev \
     oniguruma-dev \
     libzip-dev \
-    shadow
+    supervisor
 
+# PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg
-RUN docker-php-ext-install -j$(nproc) gd bcmath pdo_sqlite pdo mbstring zip intl
+RUN docker-php-ext-install -j$(nproc) \
+    gd bcmath pdo_sqlite pdo mbstring zip intl
 
+# Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-RUN mkdir -p /var/www/html
+# Diretório da app
 WORKDIR /var/www/html
 
-RUN chown -R www-data:www-data /var/www/html
+# Copia projeto
+COPY . .
+
+# Instala dependências Laravel
+RUN composer install --no-dev --optimize-autoloader
+
+# Cria SQLite + permissões
 RUN mkdir -p database \
     && touch database/database.sqlite \
     && chmod -R 777 database storage bootstrap/cache
-EXPOSE 9000
-CMD ["php-fpm"]
+
+# Configuração do Nginx
+RUN rm -rf /etc/nginx/http.d/default.conf
+COPY docker/nginx.conf /etc/nginx/http.d/default.conf
+
+# Configuração do Supervisor
+COPY docker/supervisord.conf /etc/supervisord.conf
+
+# Porta Railway
+EXPOSE 8080
+
+# Start
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
