@@ -16,12 +16,12 @@ Route::middleware('guest')->group(function () {
     // As rotas de registro só ficam ativas enquanto não existir nenhum
     // usuário no banco. Após a criação do primeiro administrador via
     // seeder, o /register fica inacessível.
-    if (User::count() === 0) {
+    // if (User::count() === 0) {
         Route::get('register', [RegisteredUserController::class, 'create'])
             ->name('register');
 
         Route::post('register', [RegisteredUserController::class, 'store']);
-    }
+    // }
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
