@@ -59,6 +59,6 @@ COPY docker/supervisord.conf /etc/supervisord.conf
 
 # Porta Railway
 EXPOSE 8080
-
+ENV PORT=8080
 # Start
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+CMD sh -c "envsubst '\$PORT' < /etc/nginx/http.d/default.conf > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
