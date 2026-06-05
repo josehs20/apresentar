@@ -34,10 +34,21 @@ COPY . .
 # Instala dependências Laravel
 RUN composer install --no-dev --optimize-autoloader
 
-# Cria SQLite + permissões
+# 🔥 LIMPA CACHE (COLOQUE AQUI)
+RUN php artisan config:clear \
+ && php artisan cache:clear \
+ && php artisan route:clear \
+ && php artisan view:clear
+
+# 🔥 Cria SQLite + permissões
 RUN mkdir -p database \
     && touch database/database.sqlite \
+    && mkdir -p storage/framework/{sessions,views,cache,testing} storage/logs bootstrap/cache \
     && chmod -R 777 database storage bootstrap/cache
+
+# (opcional depois que tudo estiver ok)
+# RUN php artisan config:cache
+# RUN php artisan route:cache
 
 # Configuração do Nginx
 RUN rm -rf /etc/nginx/http.d/default.conf
