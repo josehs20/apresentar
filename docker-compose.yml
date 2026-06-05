@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/app.dockerfile
+    image: apresentar-app
+    container_name: apresentar_app
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+      - ./storage/app/public:/var/www/html/storage/app/public
+      - ./database:/var/www/html/database
+    expose:
+      - "9000"
+    environment:
+      PHP_MEMORY_LIMIT: 512M
+
+  web:
+    image: nginx:stable-alpine
+    container_name: apresentar_web
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./storage/app/public:/var/www/html/storage/app/public
+    depends_on:
+      - app
