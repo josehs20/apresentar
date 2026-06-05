@@ -24,6 +24,8 @@ RUN mkdir -p /var/www/html
 WORKDIR /var/www/html
 
 RUN chown -R www-data:www-data /var/www/html
-
+RUN mkdir -p database \
+    && touch database/database.sqlite \
+    && chmod -R 777 database storage bootstrap/cache
 EXPOSE 9000
 CMD ["php-fpm"]
