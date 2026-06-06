@@ -88,7 +88,7 @@
     <div class="modal-dialog modal-dialog-centered" style="max-width:600px;">
         <div class="modal-content border-0" style="border-radius:16px;overflow:hidden;">
 
-            <form method="POST" action="{{ route('admin.configuracoes.update', $config) }}">
+            <form method="POST" action="{{ route('admin.configuracoes.update', $config) }}" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
 
@@ -118,10 +118,15 @@
                             Valor
                         </label>
 
-                        <textarea name="valor"
-                                  class="form-control"
-                                  rows="4"
-                                  style="border-radius:10px;border:1px solid rgba(43,43,43,0.1);font-size:14px;">{{ $config->valor }}</textarea>
+                        @if($config->tipo === 'imagem')
+                            <input type="file" name="imagem" class="form-control"
+                                   style="border-radius:10px;border:1px solid rgba(43,43,43,0.1);font-size:14px;padding:10px;">
+                            <small class="text-muted">Deixe vazio para manter a imagem atual.</small>
+                            <input type="hidden" name="valor" value="{{ $config->valor }}">
+                        @else
+                            <textarea name="valor" class="form-control" rows="4"
+                                      style="border-radius:10px;border:1px solid rgba(43,43,43,0.1);font-size:14px;">{{ $config->valor }}</textarea>
+                        @endif
                     </div>
 
                     <div class="row g-3">
@@ -158,7 +163,7 @@
                         <div class="mt-4">
                             <p class="mb-2 text-muted" style="font-size:12px;">Preview</p>
 
-                            <img src="{{ asset('storage/'.$config->valor) }}"
+                            <img src="{{ $config->imagem_url }}"
                                  style="width:100%;border-radius:12px;object-fit:cover;">
                         </div>
                     @endif
@@ -194,7 +199,7 @@
         <div class="modal-content border-0" style="border-radius:16px;overflow:hidden;">
 
 
-        <form method="POST" action="{{ route('admin.configuracoes.store') }}">
+        <form method="POST" action="{{ route('admin.configuracoes.store') }}" enctype="multipart/form-data">
             @csrf
 
             <!-- HEADER -->

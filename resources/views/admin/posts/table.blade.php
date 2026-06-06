@@ -13,7 +13,7 @@
             <tr>
                 <td>
                     @if($postagem->caminho_imagem)
-                        <img src="{{ asset('storage/' . $postagem->caminho_imagem) }}" alt="{{ $postagem->titulo }}" width="40" height="40" style="object-fit:cover;border-radius:6px;">
+                        <img src="{{ $postagem->imagem_url }}" alt="{{ $postagem->titulo }}" width="40" height="40" style="object-fit:cover;border-radius:6px;">
                     @else
                         <div class="bg-light d-flex align-items-center justify-content-center" style="width:40px;height:40px;border-radius:6px;">
                             <i class="bi bi-image text-muted"></i>

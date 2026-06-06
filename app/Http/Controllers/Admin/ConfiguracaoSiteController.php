@@ -3,6 +3,7 @@
 use App\Http\Controllers\Controller;
 use App\Models\ConfiguracaoSite;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ConfiguracaoSiteController extends Controller
 {
@@ -28,6 +29,11 @@ class ConfiguracaoSiteController extends Controller
             'descricao' => 'nullable',
         ]);
 
+        // Se for upload de imagem, processa o arquivo
+        if ($data['tipo'] === 'imagem' && $request->hasFile('imagem')) {
+            $data['valor'] = $request->file('imagem')->store('site', 'public');
+        }
+
         ConfiguracaoSite::create($data);
         ConfiguracaoSite::limparCache();
 
@@ -51,6 +57,16 @@ class ConfiguracaoSiteController extends Controller
         ]);
         
         $configuracao = ConfiguracaoSite::findOrFail($configuracao);
+
+        // Se for upload de imagem, processa o arquivo e apaga o anterior
+        if ($data['tipo'] === 'imagem' && $request->hasFile('imagem')) {
+            // Apaga imagem anterior se existir
+            if ($configuracao->valor && Storage::disk('public')->exists($configuracao->valor)) {
+                Storage::disk('public')->delete($configuracao->valor);
+            }
+            $data['valor'] = $request->file('imagem')->store('site', 'public');
+        }
+
         $configuracao->update($data);
         ConfiguracaoSite::limparCache();
 
@@ -61,6 +77,12 @@ class ConfiguracaoSiteController extends Controller
     public function destroy($configuracao)
     {
         $configuracao = ConfiguracaoSite::findOrFail($configuracao);
+
+        // Apaga imagem do storage se for do tipo imagem
+        if ($configuracao->tipo === 'imagem' && $configuracao->valor && Storage::disk('public')->exists($configuracao->valor)) {
+            Storage::disk('public')->delete($configuracao->valor);
+        }
+
         $configuracao->delete();
         ConfiguracaoSite::limparCache();
 

@@ -2,7 +2,7 @@
 
 @section('meta_title', ($produto->meta_titulo ?? $produto->nome) . ' - ' . config('app.name'))
 @section('meta_description', $produto->meta_descricao ?? strip_tags(Str::limit($produto->descricao, 160)))
-@section('meta_image', $produto->meta_imagem ?? ($produto->caminho_imagem ? asset('storage/' . $produto->caminho_imagem) : ''))
+@section('meta_image', $produto->meta_imagem ?? $produto->imagem_url)
 
 @section('content')
 <section style="padding:60px 0 80px;">
@@ -21,7 +21,7 @@
             <div class="col-lg-6">
                 <div class="rounded-4 overflow-hidden shadow-sm">
                     @if($produto->caminho_imagem)
-                        <img src="{{ asset('storage/' . $produto->caminho_imagem) }}" alt="{{ $produto->nome }}" class="w-100" style="max-height:500px;object-fit:cover;">
+                        <img src="{{ $produto->imagem_url }}" alt="{{ $produto->nome }}" class="w-100" style="max-height:500px;object-fit:cover;">
                     @else
                         <div style="aspect-ratio:1;background:var(--light);display:flex;align-items:center;justify-content:center;">
                             <i class="bi bi-image text-secondary" style="font-size:60px;opacity:0.3;"></i>

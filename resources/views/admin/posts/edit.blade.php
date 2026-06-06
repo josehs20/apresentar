@@ -41,7 +41,7 @@
                 </div>
                 @if($post->caminho_imagem)
                 <div class="col-md-2">
-                    <img src="{{ asset('storage/' . $post->caminho_imagem) }}" alt="Preview" class="img-thumbnail" style="border-radius:8px;max-height:80px;">
+                    <img src="{{ $post->imagem_url }}" alt="Preview" class="img-thumbnail" style="border-radius:8px;max-height:80px;">
                 </div>
                 @endif
             </div>

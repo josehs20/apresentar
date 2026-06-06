@@ -22,7 +22,7 @@
         <div class="card card-custom">
             <div class="card-body text-center p-4">
                 @if($product->caminho_imagem)
-                    <img src="{{ asset('storage/' . $product->caminho_imagem) }}" alt="{{ $product->nome }}" class="img-fluid rounded-3">
+                    <img src="{{ $product->imagem_url }}" alt="{{ $product->nome }}" class="img-fluid rounded-3">
                 @else
                     <div class="py-5">
                         <i class="bi bi-image display-3 text-muted"></i>

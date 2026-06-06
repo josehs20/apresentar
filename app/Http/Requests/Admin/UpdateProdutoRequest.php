@@ -29,14 +29,22 @@ class UpdateProdutoRequest extends FormRequest
     }
 
     protected function prepareForValidation()
-{
-    if ($this->preco) {
-        $preco = str_replace('.', '', $this->preco); // remove milhar
-        $preco = str_replace(',', '.', $preco); // troca vírgula por ponto
+    {
+        if ($this->preco) {
+            $preco = $this->preco;
 
-        $this->merge([
-            'preco' => $preco
-        ]);
+            // Se tiver vírgula, assume formato brasileiro: 1.199,90 ou 119,90
+            if (str_contains($preco, ',')) {
+                // Remove pontos de milhar: 1.199,90 → 1199,90
+                $preco = str_replace('.', '', $preco);
+                // Troca vírgula decimal por ponto: 1199,90 → 1199.90
+                $preco = str_replace(',', '.', $preco);
+            }
+            // Se não tiver vírgula, assume que já está no formato americano (119.90) ou inteiro (119)
+
+            $this->merge([
+                'preco' => $preco
+            ]);
+        }
     }
-}
 }

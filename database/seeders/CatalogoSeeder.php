@@ -26,88 +26,125 @@ class CatalogoSeeder extends Seeder
     }
 
     /**
-     * Garante que o diretório de imagens temporárias existe.
+     * Garante que o diretório existe no storage public.
+     * Usa makeDirectory com recursive true para criar pais se necessário.
      */
     protected function ensureDir(string $dir): void
     {
-        if (!Storage::disk('public')->exists($dir)) {
-            Storage::disk('public')->makeDirectory($dir);
+        $disk = Storage::disk('public');
+        
+        // Tenta criar o diretório recursivamente e define permissões
+        if (!$disk->exists($dir)) {
+            $disk->makeDirectory($dir, 0775, true, true);
         }
     }
 
     /**
-     * Baixa uma imagem do Unsplash e salva no disco public.
+     * Gera uma imagem SVG placeholder no lugar de baixar de serviços externos.
      * Retorna o caminho relativo para salvar no banco.
      */
     protected function downloadImage(string $url, string $filename): ?string
     {
         $this->ensureDir('produtos');
-        $this->ensureDir('postagens');
+
+        $path = 'produtos/' . $filename;
+
+        if (Storage::disk('public')->exists($path)) {
+            return $path;
+        }
 
         try {
             $context = stream_context_create([
                 'http' => [
-                    'timeout' => 15,
+                    'timeout' => 8,
                     'user_agent' => 'Mozilla/5.0 (compatible; Laravel Seeder)',
                 ],
             ]);
 
             $imageContent = @file_get_contents($url, false, $context);
 
-            if ($imageContent === false) {
-                $this->command?->warn("Não foi possível baixar: {$url}");
-                return null;
+            if ($imageContent !== false) {
+                $finfo = new \finfo(FILEINFO_MIME_TYPE);
+                $mimeType = $finfo->buffer($imageContent);
+                if (str_starts_with($mimeType, 'image/')) {
+                    Storage::disk('public')->put($path, $imageContent, 'public');
+                    return $path;
+                }
             }
-
-            // Detectar extensão pelo tipo MIME
-            $finfo = new \finfo(FILEINFO_MIME_TYPE);
-            $mimeType = $finfo->buffer($imageContent);
-            $ext = match ($mimeType) {
-                'image/jpeg' => 'jpg',
-                'image/png'  => 'png',
-                'image/webp' => 'webp',
-                default      => 'jpg',
-            };
-
-            $path = 'produtos/' . $filename;
-            Storage::disk('public')->put($path, $imageContent);
-
-            return $path;
         } catch (\Exception $e) {
-            $this->command?->warn("Erro ao baixar imagem: {$e->getMessage()}");
-            return null;
+            $this->command?->warn("  -> Erro ao baixar imagem {$filename}: " . $e->getMessage());
         }
+
+        $slug = pathinfo($filename, PATHINFO_FILENAME);
+        $name = ucwords(str_replace(['-', '_'], ' ', $slug));
+        $colors = ['#d4c5b5', '#bfae9e', '#e8ddd0', '#c4b5a0', '#d9cdb8', '#b8a890'];
+        $color = $colors[abs(crc32($slug)) % count($colors)];
+
+        $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800">'
+            . '<rect width="100%" height="100%" fill="' . $color . '"/>'
+            . '<text x="50%" y="40%" dominant-baseline="central" text-anchor="middle"'
+            . ' font-size="120" fill="#2e5e4e" opacity="0.15">🌸</text>'
+            . '<text x="50%" y="62%" dominant-baseline="central" text-anchor="middle"'
+            . ' font-size="20" fill="#6B4F3A" opacity="0.5" font-family="sans-serif">' . $name . '</text>'
+            . '</svg>';
+
+        Storage::disk('public')->put($path, $svg, 'public');
+        $this->command?->warn("  -> Placeholder gerado para: {$filename}");
+
+        return $path;
     }
 
     /**
-     * Baixa imagem para postagens.
+     * Baixa imagem para postagens com fallback para placeholder.
      */
     protected function downloadBlogImage(string $url, string $filename): ?string
     {
+        $this->ensureDir('postagens');
+        $path = 'postagens/' . $filename;
+
+        if (Storage::disk('public')->exists($path)) {
+            return $path;
+        }
+
         try {
             $context = stream_context_create([
                 'http' => [
-                    'timeout' => 15,
+                    'timeout' => 8,
                     'user_agent' => 'Mozilla/5.0 (compatible; Laravel Seeder)',
                 ],
             ]);
 
             $imageContent = @file_get_contents($url, false, $context);
 
-            if ($imageContent === false) {
-                $this->command?->warn("Não foi possível baixar: {$url}");
-                return null;
+            if ($imageContent !== false) {
+                $finfo = new \finfo(FILEINFO_MIME_TYPE);
+                $mimeType = $finfo->buffer($imageContent);
+                if (str_starts_with($mimeType, 'image/')) {
+                    Storage::disk('public')->put($path, $imageContent, 'public');
+                    return $path;
+                }
             }
-
-            $this->ensureDir('postagens');
-            $path = 'postagens/' . $filename;
-            Storage::disk('public')->put($path, $imageContent);
-
-            return $path;
         } catch (\Exception $e) {
-            $this->command?->warn("Erro ao baixar imagem de blog: {$e->getMessage()}");
-            return null;
+            $this->command?->warn("  -> Erro ao baixar imagem blog {$filename}: " . $e->getMessage());
         }
+
+        $slug = pathinfo($filename, PATHINFO_FILENAME);
+        $name = ucwords(str_replace(['-', '_'], ' ', $slug));
+        $colors = ['#d4c5b5', '#bfae9e', '#e8ddd0', '#c4b5a0', '#d9cdb8', '#b8a890'];
+        $color = $colors[abs(crc32($slug)) % count($colors)];
+
+        $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600">'
+            . '<rect width="100%" height="100%" fill="' . $color . '"/>'
+            . '<text x="50%" y="40%" dominant-baseline="central" text-anchor="middle"'
+            . ' font-size="80" fill="#2e5e4e" opacity="0.15">📖</text>'
+            . '<text x="50%" y="58%" dominant-baseline="central" text-anchor="middle"'
+            . ' font-size="18" fill="#6B4F3A" opacity="0.5" font-family="sans-serif">' . $name . '</text>'
+            . '</svg>';
+
+        Storage::disk('public')->put($path, $svg, 'public');
+        $this->command?->warn("  -> Placeholder gerado para blog: {$filename}");
+
+        return $path;
     }
 
     /**
@@ -148,8 +185,6 @@ class CatalogoSeeder extends Seeder
      */
     protected function seedProdutos(): void
     {
-        // Imagens do Unsplash para cada produto (temática artesanal/natural)
-        // Imagens reais do Unsplash (temática artesanal/natural — Terra Mar Artesanal)
         $imageUrls = [
             'hidratante-facial-de-aloe-vera'       => 'https://images.unsplash.com/photo-1596755389378-c31d21fd1273?w=800&h=800&fit=crop',
             'serum-vitamina-c-natural'             => 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=800&h=800&fit=crop',
@@ -193,7 +228,6 @@ class CatalogoSeeder extends Seeder
                 'tipo_pele' => 'todas',
                 'slug'      => 'protetor-solar-mineral-fps-50',
             ],
-
             // Corpo e Banho
             [
                 'categoria' => 'corpo-e-banho',
@@ -216,7 +250,6 @@ class CatalogoSeeder extends Seeder
                 'tipo_pele' => 'seca',
                 'slug'      => 'oleo-hidratante-de-coco',
             ],
-
             // Cabelos
             [
                 'categoria' => 'cabelos',
@@ -267,7 +300,6 @@ class CatalogoSeeder extends Seeder
                 'Aloe Vera'
             );
 
-            // Baixar imagem do Unsplash
             $imagemPath = null;
             $filename = $p['slug'] . '.jpg';
             if (isset($imageUrls[$p['slug']])) {
@@ -303,7 +335,6 @@ class CatalogoSeeder extends Seeder
      */
     protected function seedPostagens(): void
     {
-        // Imagens do Unsplash para postagens do blog
         $blogImages = [
             'dicas-skincare-natural'       => 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=1200&h=600&fit=crop',
             'beneficios-cosmeticos-naturais' => 'https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=1200&h=600&fit=crop',
@@ -312,6 +343,7 @@ class CatalogoSeeder extends Seeder
 
         $postagens = [
             [
+                'slug'        => 'dicas-skincare-natural',
                 'titulo'      => '5 Dicas Para uma Rotina de Skincare Natural',
                 'resumo'      => 'Descubra como montar uma rotina de cuidados com a pele usando apenas ingredientes naturais e sustentáveis.',
                 'conteudo'    => 'Ter uma rotina de skincare natural é mais simples do que parece. '
@@ -330,6 +362,7 @@ class CatalogoSeeder extends Seeder
                 'publicado_em'  => now()->subDays(7),
             ],
             [
+                'slug'        => 'beneficios-cosmeticos-naturais',
                 'titulo'      => 'Benefícios dos Cosméticos Naturais Para a Sua Pele',
                 'resumo'      => 'Entenda por que os cosméticos naturais podem ser uma escolha mais saudável e sustentável para a sua pele.',
                 'conteudo'    => 'Os cosméticos naturais são livres de ingredientes sintéticos agressivos, como parabenos, sulfatos e fragrâncias artificiais. '
@@ -343,6 +376,7 @@ class CatalogoSeeder extends Seeder
                 'publicado_em'  => now()->subDays(15),
             ],
             [
+                'slug'        => 'spa-day-em-casa',
                 'titulo'      => 'Como Montar um Spa Day em Casa com Produtos Naturais',
                 'resumo'      => 'Transforme a sua casa em um spa relaxante e cuide do corpo e da mente usando apenas ingredientes naturais.',
                 'conteudo'    => 'Um spa day em casa é uma excelente maneira de relaxar e cuidar de si. '
@@ -362,22 +396,24 @@ class CatalogoSeeder extends Seeder
 
         $count = 0;
         foreach ($postagens as $p) {
-            $slug = Str::slug($p['titulo']);
+            $slug = Str::slug($p['slug']);
 
-            // Baixar imagem do blog do Unsplash
             $imagemPath = null;
+            
             if (isset($blogImages[$slug])) {
                 $imagemPath = $this->downloadBlogImage($blogImages[$slug], $slug . '.jpg');
             }
+
+            $finalPath = $imagemPath ?? $p['caminho_imagem'];
 
             Postagem::query()->updateOrCreate(
                 ['slug' => $slug],
                 array_merge($p, [
                     'slug'           => $slug,
-                    'caminho_imagem' => $imagemPath ?? $p['caminho_imagem'],
+                    'caminho_imagem' => $finalPath,
                     'meta_titulo'    => $p['titulo'],
                     'meta_descricao' => $p['resumo'],
-                    'meta_imagem'    => $imagemPath ?? 'seo/' . $slug . '.jpg',
+                    'meta_imagem'    => $finalPath,
                 ]),
             );
             $count++;

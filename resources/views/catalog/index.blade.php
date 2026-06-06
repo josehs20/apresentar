@@ -34,7 +34,7 @@
                     <div class="product-card">
                         <div class="card-img-wrapper">
                             @if($produto->caminho_imagem)
-                                <img src="{{ asset('storage/' . $produto->caminho_imagem) }}" alt="{{ $produto->nome }}">
+                                <img src="{{ $produto->imagem_url }}" alt="{{ $produto->nome }}">
                             @else
                                 <div class="w-100 h-100 d-flex align-items-center justify-content-center">
                                     <i class="bi bi-image text-secondary" style="font-size:40px;opacity:0.3;"></i>

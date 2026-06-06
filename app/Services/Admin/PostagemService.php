@@ -4,8 +4,8 @@ namespace App\Services\Admin;
 
 use App\Http\Requests\Admin\StorePostagemRequest;
 use App\Http\Requests\Admin\UpdatePostagemRequest;
-use App\Jobs\ProcessarImagem;
 use App\Models\Postagem;
+use App\Services\Admin\ImagemService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -34,8 +34,7 @@ class PostagemService
             $postagem = Postagem::create($data);
 
             if ($request->hasFile('imagem')) {
-                $caminho = $request->file('imagem')->store('temp', 'local');
-                ProcessarImagem::dispatch($caminho, Postagem::class, $postagem->id);
+                ImagemService::processarUpload($request, 'imagem', $postagem, 'postagens');
             }
 
             DB::commit();
@@ -54,12 +53,7 @@ class PostagemService
             $postagem->update($data);
 
             if ($request->hasFile('imagem')) {
-                if ($postagem->caminho_imagem) {
-                    Storage::disk('public')->delete($postagem->caminho_imagem);
-                }
-
-                $caminho = $request->file('imagem')->store('temp', 'local');
-                ProcessarImagem::dispatch($caminho, Postagem::class, $postagem->id);
+                ImagemService::processarUpload($request, 'imagem', $postagem, 'postagens');
             }
 
             DB::commit();

@@ -4,9 +4,10 @@ namespace App\Services\Admin;
 
 use App\Http\Requests\Admin\StoreProdutoRequest;
 use App\Http\Requests\Admin\UpdateProdutoRequest;
-use App\Jobs\ProcessarImagem;
 use App\Models\Produto;
+use App\Services\Admin\ImagemService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -43,8 +44,7 @@ class ProdutoService
             $produto = Produto::create($data);
 
             if ($request->hasFile('imagem')) {
-                $caminho = $request->file('imagem')->store('temp', 'local');
-                ProcessarImagem::dispatch($caminho, Produto::class, $produto->id);
+                ImagemService::processarUpload($request, 'imagem', $produto, 'produtos');
             }
 
             DB::commit();
@@ -60,20 +60,30 @@ class ProdutoService
         DB::beginTransaction();
         try {
             $data = $request->validated();
+            
+            Log::info('[ProdutoService] Atualizando produto', [
+                'id' => $produto->id,
+                'data' => $data,
+                'hasFile' => $request->hasFile('imagem'),
+            ]);
+
             $produto->update($data);
 
             if ($request->hasFile('imagem')) {
-                if ($produto->caminho_imagem) {
-                    Storage::disk('public')->delete($produto->caminho_imagem);
-                }
-
-                $caminho = $request->file('imagem')->store('temp', 'local');
-                ProcessarImagem::dispatch($caminho, Produto::class, $produto->id);
+                Log::info('[ProdutoService] Processando upload de imagem...');
+                ImagemService::processarUpload($request, 'imagem', $produto, 'produtos');
             }
 
             DB::commit();
             return $produto->fresh('categoria');
         } catch (\Exception $e) {
+            dd($e); // Debug temporário para capturar detalhes do erro
+            Log::error('[ProdutoService] Erro ao atualizar produto', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
             DB::rollBack();
             throw $e;
         }

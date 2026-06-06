@@ -70,7 +70,7 @@
                 </div>
                 @if($product->caminho_imagem)
                 <div class="col-md-2">
-                    <img src="{{ asset('storage/' . $product->caminho_imagem) }}" alt="Preview" class="img-thumbnail" style="border-radius:8px;max-height:80px;">
+                    <img src="{{ $product->imagem_url }}" alt="Preview" class="img-thumbnail" style="border-radius:8px;max-height:80px;">
                 </div>
                 @endif
             </div>

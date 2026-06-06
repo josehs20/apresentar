@@ -29,4 +29,26 @@ class ConfiguracaoSite extends Model
     {
         Cache::flush(); // simples (pode otimizar depois)
     }
+
+    /**
+     * Retorna a URL completa da imagem para uso nas views.
+     */
+    public function getImagemUrlAttribute(): ?string
+    {
+        if (!$this->valor) {
+            return null;
+        }
+        return asset('storage/' . $this->valor);
+    }
+
+    /**
+     * Retorna apenas o nome do arquivo (sem o caminho da pasta).
+     */
+    public function getImagemNomeAttribute(): ?string
+    {
+        if (!$this->valor) {
+            return null;
+        }
+        return basename($this->valor);
+    }
 }

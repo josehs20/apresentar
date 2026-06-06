@@ -11,12 +11,12 @@
         <div class="row align-items-center">
             <div class="col-lg-6 mb-5 mb-lg-0">
                 <div class="px-lg-4">
-                    <p class="text-secondary-custom fw-semibold mb-3" style="font-size:13px;letter-spacing:0.05em;text-transform:uppercase;">Produtos Naturais</p>
+                    <p class="text-secondary-custom fw-semibold mb-3" style="font-size:13px;letter-spacing:0.05em;text-transform:uppercase;">{{ $heroBadge ?? 'Produtos Naturais' }}</p>
                     <h1 class="hero-title mb-4">
-                        Cuide da sua pele com <span>natureza</span>
+                        {!! $heroTitulo ?? 'Cuide da sua pele com <span>natureza</span>' !!}
                     </h1>
                     <p class="hero-subtitle mb-5">
-                        Produtos artesanais feitos com ingredientes selecionados. Descubra uma rotina de cuidados que vai transformar seu dia a dia.
+                        {{ $heroSub ?? 'Produtos artesanais feitos com ingredientes selecionados. Descubra uma rotina de cuidados que vai transformar seu dia a dia.' }}
                     </p>
                     <div class="d-flex flex-wrap gap-3">
                         <a href="{{ route('catalog.index') }}" class="btn-primary-custom">
@@ -31,8 +31,12 @@
             </div>
             <div class="col-lg-6 text-center">
                 <div class="rounded-4 overflow-hidden shadow-lg" style="max-width:420px;margin:0 auto;background:linear-gradient(135deg,rgba(46,94,78,0.08),rgba(107,79,58,0.08));padding:40px;">
-                    <div style="width:100%;aspect-ratio:3/4;background:linear-gradient(135deg,#d4c5b5,#bfae9e);border-radius:16px;display:flex;align-items:center;justify-content:center;">
-                        <i class="bi bi-flower2" style="font-size:80px;color:rgba(46,94,78,0.3);"></i>
+                    <div style="width:100%;aspect-ratio:3/4;background:linear-gradient(135deg,#d4c5b5,#bfae9e);border-radius:16px;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+                        @if($heroImagem)
+                            <img src="{{ asset('storage/' . $heroImagem) }}" alt="{{ $heroBadge ?? 'Hero' }}" style="width:100%;height:100%;object-fit:cover;">
+                        @else
+                            <i class="bi bi-flower2" style="font-size:80px;color:rgba(46,94,78,0.3);"></i>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -89,28 +93,32 @@
     <div class="container">
         <div class="row align-items-center g-5">
             <div class="col-lg-6">
-                <div class="rounded-4 overflow-hidden" style="background:linear-gradient(135deg,#d4c5b5,#bfae9e);aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;">
-                    <i class="bi bi-leaf" style="font-size:80px;color:rgba(46,94,78,0.3);"></i>
+                <div class="rounded-4 overflow-hidden" style="background:linear-gradient(135deg,#d4c5b5,#bfae9e);aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+                    @if($sobreImagem)
+                        <img src="{{ asset('storage/' . $sobreImagem) }}" alt="{{ $sobreBadge ?? 'Sobre' }}" style="width:100%;height:100%;object-fit:cover;">
+                    @else
+                        <i class="bi bi-leaf" style="font-size:80px;color:rgba(46,94,78,0.3);"></i>
+                    @endif
                 </div>
             </div>
             <div class="col-lg-6">
-                <p class="text-secondary-custom fw-semibold mb-3" style="font-size:13px;letter-spacing:0.05em;text-transform:uppercase;">Nossa História</p>
-                <h2 class="fw-bold mb-4" style="font-size:2rem;color:var(--dark);">Feito com amor e natureza</h2>
+                <p class="text-secondary-custom fw-semibold mb-3" style="font-size:13px;letter-spacing:0.05em;text-transform:uppercase;">{{ $sobreBadge ?? 'Nossa História' }}</p>
+                <h2 class="fw-bold mb-4" style="font-size:2rem;color:var(--dark);">{{ $sobreTitulo ?? 'Feito com amor e natureza' }}</h2>
                 <p class="text-muted mb-4" style="line-height:1.8;font-size:16px;">
-                    Acreditamos que o cuidado com a pele começa com ingredientes que você pode reconhecer. Cada produto é desenvolvido com carinho usando o que a natureza tem de melhor para oferecer.
+                    {{ $sobreDescricao ?? 'Acreditamos que o cuidado com a pele começa com ingredientes que você pode reconhecer. Cada produto é desenvolvido com carinho usando o que a natureza tem de melhor para oferecer.' }}
                 </p>
                 <div class="d-flex gap-4">
                     <div>
-                        <div class="fs-3 fw-bold" style="color:var(--accent);">100%</div>
-                        <div class="text-muted small">Natural</div>
+                        <div class="fs-3 fw-bold" style="color:var(--accent);">{{ $sobreStat1Valor ?? '100%' }}</div>
+                        <div class="text-muted small">{{ $sobreStat1Titulo ?? 'Natural' }}</div>
                     </div>
                     <div>
-                        <div class="fs-3 fw-bold" style="color:var(--accent);">10+</div>
-                        <div class="text-muted small">Produtos</div>
+                        <div class="fs-3 fw-bold" style="color:var(--accent);">{{ $sobreStat2Valor ?? '10+' }}</div>
+                        <div class="text-muted small">{{ $sobreStat2Titulo ?? 'Produtos' }}</div>
                     </div>
                     <div>
-                        <div class="fs-3 fw-bold" style="color:var(--accent);">500+</div>
-                        <div class="text-muted small">Clientes</div>
+                        <div class="fs-3 fw-bold" style="color:var(--accent);">{{ $sobreStat3Valor ?? '500+' }}</div>
+                        <div class="text-muted small">{{ $sobreStat3Titulo ?? 'Clientes' }}</div>
                     </div>
                 </div>
             </div>
@@ -152,6 +160,64 @@
     </div>
 </section>
 @endif
+
+{{-- CONTATO --}}
+<section style="padding:80px 0;">
+    <div class="container">
+        <div class="text-center mb-5">
+            <p class="text-secondary-custom fw-semibold mb-2" style="font-size:13px;letter-spacing:0.05em;text-transform:uppercase;">Fale Conosco</p>
+            <h2 class="fw-bold" style="font-size:2rem;color:var(--dark);">Entre em Contato</h2>
+        </div>
+        <div class="row justify-content-center g-4">
+            @if($contatoTelefone)
+            <div class="col-md-4">
+                <div class="text-center p-4 rounded-4" style="background:linear-gradient(135deg,rgba(46,94,78,0.06),rgba(107,79,58,0.06));">
+                    <div class="mb-3" style="width:56px;height:56px;margin:0 auto;background:linear-gradient(135deg,var(--primary),var(--accent));border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                        <i class="bi bi-whatsapp text-white" style="font-size:24px;"></i>
+                    </div>
+                    <h5 class="fw-semibold mb-2" style="color:var(--dark);">Telefone / WhatsApp</h5>
+                    <p class="text-muted mb-0">{{ $contatoTelefone }}</p>
+                </div>
+            </div>
+            @endif
+            @if($contatoEmail)
+            <div class="col-md-4">
+                <div class="text-center p-4 rounded-4" style="background:linear-gradient(135deg,rgba(46,94,78,0.06),rgba(107,79,58,0.06));">
+                    <div class="mb-3" style="width:56px;height:56px;margin:0 auto;background:linear-gradient(135deg,var(--primary),var(--accent));border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                        <i class="bi bi-envelope text-white" style="font-size:24px;"></i>
+                    </div>
+                    <h5 class="fw-semibold mb-2" style="color:var(--dark);">E-mail</h5>
+                    <p class="text-muted mb-0">{{ $contatoEmail }}</p>
+                </div>
+            </div>
+            @endif
+            @if($contatoEndereco)
+            <div class="col-md-4">
+                <div class="text-center p-4 rounded-4" style="background:linear-gradient(135deg,rgba(46,94,78,0.06),rgba(107,79,58,0.06));">
+                    <div class="mb-3" style="width:56px;height:56px;margin:0 auto;background:linear-gradient(135deg,var(--primary),var(--accent));border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                        <i class="bi bi-geo-alt text-white" style="font-size:24px;"></i>
+                    </div>
+                    <h5 class="fw-semibold mb-2" style="color:var(--dark);">Endereço</h5>
+                    <p class="text-muted mb-0">{{ $contatoEndereco }}</p>
+                </div>
+            </div>
+            @endif
+            @if($instagramUrl)
+            <div class="col-md-4">
+                <a href="{{ route('interacao.redirect', ['tipo' => 'instagram', 'produto' => 1]) }}" target="_blank" class="text-decoration-none">
+                    <div class="text-center p-4 rounded-4" style="background:linear-gradient(135deg,rgba(46,94,78,0.06),rgba(107,79,58,0.06));">
+                        <div class="mb-3" style="width:56px;height:56px;margin:0 auto;background:linear-gradient(135deg,#833ab4,#fd1d1d);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                            <i class="bi bi-instagram text-white" style="font-size:24px;"></i>
+                        </div>
+                        <h5 class="fw-semibold mb-2" style="color:var(--dark);">Instagram</h5>
+                        <p class="text-muted mb-0">@terra.mar.artesanal</p>
+                    </div>
+                </a>
+            </div>
+            @endif
+        </div>
+    </div>
+</section>
 
 {{-- CTA --}}
 <section class="cta-section">

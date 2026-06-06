@@ -225,9 +225,21 @@
                 </div>
                 <div class="col-lg-3">
                     <h6>Contato</h6>
+                    @php
+                        $footerTelefone = \App\Models\ConfiguracaoSite::get('contato_telefone');
+                        $footerEmail    = \App\Models\ConfiguracaoSite::get('contato_email');
+                        $footerEndereco = \App\Models\ConfiguracaoSite::get('contato_endereco');
+                    @endphp
                     <div class="d-flex flex-column gap-2">
-                        <span class="small"><i class="bi bi-geo-alt me-2"></i>Sua cidade, Brasil</span>
-                        <span class="small"><i class="bi bi-envelope me-2"></i>contato@{{ config('app.name') }}.com.br</span>
+                        @if($footerEndereco)
+                            <span class="small"><i class="bi bi-geo-alt me-2"></i>{{ $footerEndereco }}</span>
+                        @endif
+                        @if($footerEmail)
+                            <span class="small"><i class="bi bi-envelope me-2"></i>{{ $footerEmail }}</span>
+                        @endif
+                        @if($footerTelefone)
+                            <span class="small"><i class="bi bi-whatsapp me-2"></i>{{ $footerTelefone }}</span>
+                        @endif
                     </div>
                 </div>
                 <div class="col-lg-3">

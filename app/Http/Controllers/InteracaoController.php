@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ConfiguracaoSite;
 use App\Models\Interacao;
 use App\Models\Produto;
 use App\Models\TipoInteracao;
@@ -54,8 +55,29 @@ class InteracaoController extends Controller
 
     private function redirectWhatsApp(Produto $produto): RedirectResponse
     {
-        $numero = config('app.whatsapp_number', '5511999999999');
-        $mensagem = "Olá! Tenho interesse no produto {$produto->nome}";
+        $telefoneRaw = ConfiguracaoSite::get('contato_telefone', '');
+
+        // Remove qualquer caractere não numérico
+        $numero = preg_replace('/\D/', '', $telefoneRaw);
+
+        // Garante que tenha no mínimo 10 dígitos (DDD + número)
+        if (strlen($numero) < 10) {
+            $numero = '5511999999999'; // fallback seguro
+        }
+
+        // Se tiver 10 ou 11 dígitos e NÃO começar com 55, adiciona o prefixo do Brasil
+        if (strlen($numero) >= 10 && !str_starts_with($numero, '55')) {
+            $numero = '55' . $numero;
+        }
+
+        // Se for o produto genérico (id=1), usa mensagem de boas-vindas
+        // Caso contrário, mensagem personalizada com o nome do produto
+        if ($produto->id === 1) {
+            $mensagem = "Olá! Gostaria de saber mais sobre os produtos naturais.";
+        } else {
+            $mensagem = "Olá! Tenho interesse no produto {$produto->nome}.";
+        }
+
         $url = "https://wa.me/{$numero}?text=" . urlencode($mensagem);
 
         return redirect()->away($url);
@@ -63,7 +85,7 @@ class InteracaoController extends Controller
 
     private function redirectInstagram(): RedirectResponse
     {
-        $perfil = config('app.instagram_profile', 'https://instagram.com/seuperfil');
+        $perfil = ConfiguracaoSite::get('instagram_url', 'https://instagram.com/seuperfil');
 
         return redirect()->away($perfil);
     }

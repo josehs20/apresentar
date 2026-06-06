@@ -19,7 +19,7 @@
                     <div class="blog-card">
                         @if($post->caminho_imagem)
                         <div class="card-img-wrapper">
-                            <img src="{{ asset('storage/' . $post->caminho_imagem) }}" alt="{{ $post->titulo }}">
+                            <img src="{{ $post->imagem_url }}" alt="{{ $post->titulo }}">
                         </div>
                         @endif
                         <div class="p-4">

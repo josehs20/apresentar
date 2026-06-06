@@ -2,7 +2,7 @@
 
 @section('meta_title', ($post->meta_titulo ?? $post->titulo) . ' - ' . config('app.name'))
 @section('meta_description', $post->meta_descricao ?? strip_tags(Str::limit($post->resumo ?? $post->conteudo, 160)))
-@section('meta_image', $post->meta_imagem ?? ($post->caminho_imagem ? asset('storage/' . $post->caminho_imagem) : ''))
+@section('meta_image', $post->meta_imagem ?? $post->imagem_url)
 
 @section('content')
 <article style="padding:60px 0 80px;">
@@ -18,7 +18,7 @@
 
         @if($post->caminho_imagem)
         <div class="rounded-4 overflow-hidden mb-5">
-            <img src="{{ asset('storage/' . $post->caminho_imagem) }}" alt="{{ $post->titulo }}" class="w-100" style="max-height:400px;object-fit:cover;">
+            <img src="{{ $post->imagem_url }}" alt="{{ $post->titulo }}" class="w-100" style="max-height:400px;object-fit:cover;">
         </div>
         @endif
 

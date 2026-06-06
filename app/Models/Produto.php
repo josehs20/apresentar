@@ -63,4 +63,26 @@ class Produto extends Model
     {
         return $this->hasMany(Interacao::class);
     }
+
+    /**
+     * Retorna a URL completa da imagem para uso nas views.
+     */
+    public function getImagemUrlAttribute(): ?string
+    {
+        if (!$this->caminho_imagem) {
+            return null;
+        }
+        return asset('storage/' . $this->caminho_imagem);
+    }
+
+    /**
+     * Retorna apenas o nome do arquivo (sem o caminho da pasta).
+     */
+    public function getImagemNomeAttribute(): ?string
+    {
+        if (!$this->caminho_imagem) {
+            return null;
+        }
+        return basename($this->caminho_imagem);
+    }
 }

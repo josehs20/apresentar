@@ -20,7 +20,7 @@
 <div class="card card-custom">
     <div class="card-body p-5">
         @if($post->caminho_imagem)
-            <img src="{{ asset('storage/' . $post->caminho_imagem) }}" alt="{{ $post->titulo }}" class="img-fluid rounded-3 mb-4" style="max-height: 300px;object-fit:cover;">
+            <img src="{{ $post->imagem_url }}" alt="{{ $post->titulo }}" class="img-fluid rounded-3 mb-4" style="max-height: 300px;object-fit:cover;">
         @endif
 
         @if($post->publicado_em)
