@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ConfiguracaoSiteController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\InteracaoController;
+use App\Http\Controllers\Admin\LojaVinculadaController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\TipoInteracaoController;
@@ -48,6 +49,12 @@ Route::prefix('admin')->middleware(['auth'])->name('admin.')->group(function () 
     Route::patch('/tipos-interacao/{tipoInteracao}/toggle-ativo', [TipoInteracaoController::class, 'toggleAtivo'])->name('tipos-interacao.toggle-ativo');
     Route::resource('tipos-interacao', TipoInteracaoController::class)->parameters([
         'tipos-interacao' => 'tipoInteracao',
+    ]);
+
+    // Lojas Vinculadas
+    Route::get('/lojas-vinculadas-table', [LojaVinculadaController::class, 'table'])->name('lojas-vinculadas.table');
+    Route::resource('lojas-vinculadas', LojaVinculadaController::class)->parameters([
+        'lojas-vinculadas' => 'lojaVinculada',
     ]);
 
     // Configurações do Site

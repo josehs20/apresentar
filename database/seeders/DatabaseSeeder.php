@@ -18,7 +18,9 @@ class DatabaseSeeder extends Seeder
             AdminUserSeeder::class,
             TipoInteracaoSeeder::class,
             CatalogoSeeder::class,
+            ConfiguracaoCoresSeeder::class,
             ConfiguracaoSiteSeeder::class,
+            LojaVinculadaSeeder::class,
         ]);
     }
 }

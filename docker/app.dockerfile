@@ -1,8 +1,7 @@
-FROM php:8.2-fpm-alpine
+FROM php:8.4-fpm-alpine
 
-# Instala dependências
+# Instala dependências (removido nginx e supervisor - desnecessários)
 RUN apk add --no-cache \
-    nginx \
     bash \
     curl \
     git \
@@ -15,7 +14,7 @@ RUN apk add --no-cache \
     sqlite-dev \
     oniguruma-dev \
     libzip-dev \
-    supervisor
+    gettext
 
 # PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg
@@ -31,34 +30,18 @@ WORKDIR /var/www/html
 # Copia projeto
 COPY . .
 
-# Instala dependências Laravel
-RUN composer install --no-dev --optimize-autoloader
+# Instala dependências Laravel (útil para cache de imagem, mas entrypoint garante caso volume sobrescreva)
+RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# 🔥 LIMPA CACHE (COLOQUE AQUI)
-RUN php artisan config:clear \
- && php artisan cache:clear \
- && php artisan route:clear \
- && php artisan view:clear
-
-# 🔥 Cria SQLite + permissões
+# Cria diretórios necessários com permissões
 RUN mkdir -p database \
     && touch database/database.sqlite \
     && mkdir -p storage/framework/{sessions,views,cache,testing} storage/logs bootstrap/cache \
-    && chmod -R 777 database storage bootstrap/cache
+    && chmod -R 777 storage bootstrap/cache database
 
-# (opcional depois que tudo estiver ok)
-# RUN php artisan config:cache
-# RUN php artisan route:cache
+# Torna o entrypoint executável
+COPY docker/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# Configuração do Nginx
-RUN rm -rf /etc/nginx/http.d/default.conf
-COPY docker/nginx.conf /etc/nginx/http.d/default.conf
-
-# Configuração do Supervisor
-COPY docker/supervisord.conf /etc/supervisord.conf
-
-# Porta Railway
-EXPOSE 8080
-ENV PORT=8080
-# Start
-CMD sh -c "envsubst '\$PORT' < /etc/nginx/http.d/default.conf > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
+# Entrypoint que gerencia migrações, cache e permissões em runtime
+ENTRYPOINT ["docker-entrypoint.sh"]

@@ -123,6 +123,24 @@
                                    style="border-radius:10px;border:1px solid rgba(43,43,43,0.1);font-size:14px;padding:10px;">
                             <small class="text-muted">Deixe vazio para manter a imagem atual.</small>
                             <input type="hidden" name="valor" value="{{ $config->valor }}">
+                        @elseif($config->tipo === 'cor')
+                            <div class="d-flex align-items-center gap-3" id="colorPicker{{ $config->id }}">
+                                <input type="color" name="valor" value="{{ $config->valor ?? '#76877D' }}"
+                                       style="width:60px;height:48px;border-radius:10px;border:1px solid rgba(43,43,43,0.1);padding:2px;cursor:pointer;">
+                                <input type="text" value="{{ $config->valor ?? '#76877D' }}"
+                                       class="form-control color-hex-text" style="border-radius:10px;border:1px solid rgba(43,43,43,0.1);font-size:14px;font-family:monospace;"
+                                       placeholder="#76877D" maxlength="7">
+                                <script>
+                                    (function() {
+                                        const container = document.getElementById('colorPicker{{ $config->id }}');
+                                        const colorInput = container.querySelector('input[type=color]');
+                                        const textInput = container.querySelector('.color-hex-text');
+                                        colorInput.addEventListener('input', function() { textInput.value = this.value; });
+                                        textInput.addEventListener('input', function() { colorInput.value = this.value; });
+                                    })();
+                                </script>
+                            </div>
+                            <small class="text-muted">Selecione uma cor ou digite o código hexadecimal (ex: #76877D).</small>
                         @else
                             <textarea name="valor" class="form-control" rows="4"
                                       style="border-radius:10px;border:1px solid rgba(43,43,43,0.1);font-size:14px;">{{ $config->valor }}</textarea>
@@ -256,6 +274,7 @@
                             <option value="texto">Texto</option>
                             <option value="html">HTML</option>
                             <option value="imagem">Imagem</option>
+                            <option value="cor">Cor</option>
                             <option value="json">JSON</option>
                         </select>
                     </div>

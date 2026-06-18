@@ -19,13 +19,14 @@
 
     <style>
         :root {
-            --primary: #6B4F3A;
-            --primary-light: #8B6F5A;
-            --secondary: #A67C52;
-            --accent: #2E5E4E;
-            --accent-light: #3A7A66;
-            --light: #F5F1EB;
-            --dark: #2B2B2B;
+            --primary: {{ $coresSite['--primary'] }};
+            --primary-light: {{ $coresSite['--primary-light'] }};
+            --secondary: {{ $coresSite['--secondary'] }};
+            --accent: {{ $coresSite['--accent'] }};
+            --accent-light: {{ $coresSite['--accent-light'] }};
+            --light: {{ $coresSite['--light'] }};
+            --dark: {{ $coresSite['--dark'] }};
+            --border-soft: {{ $coresSite['--border-soft'] }};
             --radius: 12px;
             --radius-sm: 8px;
             --transition: 0.3s ease;
