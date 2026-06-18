@@ -22,15 +22,14 @@
 
     <style>
         :root {
-            --primary: {{ $coresSite['--primary'] }};
-            --primary-light: {{ $coresSite['--primary-light'] }};
-            --secondary: {{ $coresSite['--secondary'] }};
-            --accent: {{ $coresSite['--accent'] }};
-            --accent-light: {{ $coresSite['--accent-light'] }};
-            --light: {{ $coresSite['--light'] }};
-            --light-2: {{ $coresSite['--light-2'] }};
-            --dark: {{ $coresSite['--dark'] }};
-            --border-soft: {{ $coresSite['--border-soft'] }};
+            --primary: #6B4F3A;
+            --primary-light: #8B6F5A;
+            --secondary: #A67C52;
+            --accent: #2E5E4E;
+            --accent-light: #3A7A66;
+            --light: #F5F1EB;
+            --light-2: #EDE7DE;
+            --dark: #2B2B2B;
             --sidebar-width: 260px;
             --sidebar-collapsed: 70px;
             --topbar-height: 64px;

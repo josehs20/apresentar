@@ -31,11 +31,6 @@
             <span class="sidebar-text">Blog</span>
         </a>
 
-        <a href="{{ route('admin.lojas-vinculadas.index') }}" class="sidebar-item {{ request()->routeIs('admin.lojas-vinculadas.*') ? 'active' : '' }}">
-            <i class="bi bi-shop sidebar-icon"></i>
-            <span class="sidebar-text">Lojas Vinculadas</span>
-        </a>
-
         <a href="{{ route('admin.interactions.index') }}" class="sidebar-item {{ request()->routeIs('admin.interactions.*') ? 'active' : '' }}">
             <i class="bi bi-activity sidebar-icon"></i>
             <span class="sidebar-text">Interações</span>

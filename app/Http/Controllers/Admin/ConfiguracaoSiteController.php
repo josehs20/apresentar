@@ -3,7 +3,6 @@
 use App\Http\Controllers\Controller;
 use App\Models\ConfiguracaoSite;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
 class ConfiguracaoSiteController extends Controller
@@ -37,7 +36,6 @@ class ConfiguracaoSiteController extends Controller
 
         ConfiguracaoSite::create($data);
         ConfiguracaoSite::limparCache();
-        Cache::forget('cores_site');
 
         return redirect()->route('admin.configuracoes.index')
             ->with('success', 'Configuração criada com sucesso!');
@@ -71,7 +69,6 @@ class ConfiguracaoSiteController extends Controller
 
         $configuracao->update($data);
         ConfiguracaoSite::limparCache();
-        Cache::forget('cores_site');
 
         return redirect()->route('admin.configuracoes.index')
             ->with('success', 'Configuração atualizada!');
@@ -88,7 +85,6 @@ class ConfiguracaoSiteController extends Controller
 
         $configuracao->delete();
         ConfiguracaoSite::limparCache();
-        Cache::forget('cores_site');
 
         return back()->with('success', 'Removido!');
     }

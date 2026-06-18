@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\ConfiguracaoSite;
-use App\Models\LojaVinculada;
 use App\Models\Postagem;
 use App\Models\Produto;
 use Illuminate\View\View;
@@ -45,9 +44,6 @@ class HomeController extends Controller
         $contatoEndereco = $configuracoes['contato_endereco'] ?? null;
         $instagramUrl    = $configuracoes['instagram_url'] ?? null;
 
-        // Lojas vinculadas ativas
-        $lojasAtivas = LojaVinculada::where('ativo', true)->orderBy('nome')->get();
-
         return view('home', compact(
             'destaques',
             'ultimosPosts',
@@ -69,7 +65,6 @@ class HomeController extends Controller
             'contatoEmail',
             'contatoEndereco',
             'instagramUrl',
-            'lojasAtivas',
         ));
     }
 }

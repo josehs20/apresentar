@@ -87,51 +87,7 @@
     </div>
 </section>
 @endif
-{{-- ONDE NOS ENCONTRAR --}}
-@if(isset($lojasAtivas) && $lojasAtivas->count() > 0)
-<section style="padding:80px 0;background:var(--light);">
-    <div class="container">
-        <div class="text-center mb-5">
-            <p class="fw-semibold mb-2" style="font-size:13px;letter-spacing:0.05em;text-transform:uppercase;color:var(--secondary);">Lojas Vinculadas</p>
-            <h2 class="fw-bold" style="font-size:2rem;color:var(--dark);">Onde Nos Encontrar</h2>
-            <p class="text-muted" style="max-width:500px;margin:8px auto 0;">Encontre nossos produtos nas lojas parceiras mais próximas de você.</p>
-        </div>
-        <div class="row g-4">
-            @foreach($lojasAtivas as $loja)
-            <div class="col-md-6 col-lg-4">
-                <div class="h-100 p-4 rounded-4" style="background:#fff;border:1px solid var(--border-soft);transition:all 0.3s ease;">
-                    <div class="d-flex align-items-center gap-3 mb-3">
-                        <div style="width:48px;height:48px;border-radius:12px;background:rgba(118,135,125,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                            <i class="bi bi-shop" style="font-size:22px;color:var(--primary);"></i>
-                        </div>
-                        <div>
-                            <h5 class="fw-semibold mb-0" style="font-size:16px;color:var(--dark);">{{ $loja->nome }}</h5>
-                        </div>
-                    </div>
-                    <p class="mb-2 small" style="color:var(--secondary);line-height:1.6;">
-                        <i class="bi bi-geo-alt me-1" style="color:var(--primary);"></i>
-                        {{ $loja->endereco }}<br>
-                        <span class="ms-4">{{ $loja->cidade }}, {{ $loja->estado }}</span>
-                    </p>
-                    <div class="d-flex flex-wrap gap-2 mt-3">
-                        @if($loja->instagram)
-                        <span style="color:var(--primary);font-size:13px;font-weight:500;">
-                            <i class="bi bi-instagram me-1"></i>{{ $loja->instagram }}
-                        </span>
-                        @endif
-                        @if($loja->link_google_maps)
-                        <a href="{{ $loja->link_google_maps }}" target="_blank" class="btn btn-sm ms-auto" style="background:var(--accent);color:#fff;border-radius:8px;font-weight:500;font-size:13px;padding:6px 16px;transition:all 0.2s ease;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
-                            <i class="bi bi-map me-1"></i>Como Chegar
-                        </a>
-                        @endif
-                    </div>
-                </div>
-            </div>
-            @endforeach
-        </div>
-    </div>
-</section>
-@endif
+
 {{-- SOBRE A MARCA --}}
 <section class="about-section">
     <div class="container">
@@ -171,6 +127,39 @@
 </section>
 
 {{-- ÚLTIMOS BLOG --}}
+@if(isset($ultimosPosts) && $ultimosPosts->count() > 0)
+<section style="padding:80px 0;">
+    <div class="container">
+        <div class="text-center mb-5">
+            <p class="text-secondary-custom fw-semibold mb-2" style="font-size:13px;letter-spacing:0.05em;text-transform:uppercase;">Dicas e Novidades</p>
+            <h2 class="fw-bold" style="font-size:2rem;color:var(--dark);">Últimas do Blog</h2>
+        </div>
+        <div class="row g-4">
+            @foreach($ultimosPosts as $post)
+            <div class="col-md-4">
+                <a href="{{ route('blog.show', $post->slug) }}" class="text-decoration-none">
+                    <div class="blog-card">
+                        @if($post->caminho_imagem)
+                        <div class="card-img-wrapper">
+                            <img src="{{ asset('storage/' . $post->caminho_imagem) }}" alt="{{ $post->titulo }}">
+                        </div>
+                        @endif
+                        <div class="p-4">
+                            <p class="text-muted small mb-2">{{ $post->publicado_em ? $post->publicado_em->format('d/m/Y') : '' }}</p>
+                            <h5 class="fw-semibold text-dark mb-2">{{ $post->titulo }}</h5>
+                            @if($post->resumo)
+                                <p class="text-muted small" style="line-height:1.6;">{{ \Illuminate\Support\Str::limit($post->resumo, 120) }}</p>
+                            @endif
+                            <span class="text-secondary-custom small fw-medium">Ler mais →</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
 
 {{-- CONTATO --}}
 <section style="padding:80px 0;">
@@ -229,40 +218,6 @@
         </div>
     </div>
 </section>
-@if(isset($ultimosPosts) && $ultimosPosts->count() > 0)
-<section style="padding:80px 0;">
-    <div class="container">
-        <div class="text-center mb-5">
-            <p class="text-secondary-custom fw-semibold mb-2" style="font-size:13px;letter-spacing:0.05em;text-transform:uppercase;">Dicas e Novidades</p>
-            <h2 class="fw-bold" style="font-size:2rem;color:var(--dark);">Últimas do Blog</h2>
-        </div>
-        <div class="row g-4">
-            @foreach($ultimosPosts as $post)
-            <div class="col-md-4">
-                <a href="{{ route('blog.show', $post->slug) }}" class="text-decoration-none">
-                    <div class="blog-card">
-                        @if($post->caminho_imagem)
-                        <div class="card-img-wrapper">
-                            <img src="{{ asset('storage/' . $post->caminho_imagem) }}" alt="{{ $post->titulo }}">
-                        </div>
-                        @endif
-                        <div class="p-4">
-                            <p class="text-muted small mb-2">{{ $post->publicado_em ? $post->publicado_em->format('d/m/Y') : '' }}</p>
-                            <h5 class="fw-semibold text-dark mb-2">{{ $post->titulo }}</h5>
-                            @if($post->resumo)
-                                <p class="text-muted small" style="line-height:1.6;">{{ \Illuminate\Support\Str::limit($post->resumo, 120) }}</p>
-                            @endif
-                            <span class="text-secondary-custom small fw-medium">Ler mais →</span>
-                        </div>
-                    </div>
-                </a>
-            </div>
-            @endforeach
-        </div>
-    </div>
-</section>
-@endif
-
 
 {{-- CTA --}}
 <section class="cta-section">

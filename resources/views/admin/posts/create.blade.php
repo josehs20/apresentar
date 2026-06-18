@@ -49,9 +49,9 @@
                 <div class="col-md-4">
                     <x-form.textarea name="meta_descricao" label="Meta Descrição" rows="2" maxlength="160" placeholder="Descrição para SEO" />
                 </div>
-                <!-- <div class="col-md-4">
+                <div class="col-md-4">
                     <x-form.input name="meta_imagem" label="Meta Imagem (URL)" placeholder="https://..." />
-                </div> -->
+                </div>
             </div>
 
             <div class="mt-5 d-flex gap-2">
