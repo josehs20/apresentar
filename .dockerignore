@@ -11,9 +11,6 @@ docker-compose*.yml
 task_progress.md
 storage/framework/cache/data/
 storage/logs/.gitignore
-vite.config.js
-postcss.config.js
-tailwind.config.js
 .editorconfig
 .phpunit.*
 phpunit.xml

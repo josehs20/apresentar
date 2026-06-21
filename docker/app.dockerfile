@@ -1,8 +1,7 @@
-FROM php:8.4-fpm-alpine
+FROM php:8.4-fpm-alpine AS app
 
-# Instala dependências
+# Instala dependências do sistema
 RUN apk add --no-cache \
-    nginx \
     bash \
     curl \
     git \
@@ -16,7 +15,9 @@ RUN apk add --no-cache \
     oniguruma-dev \
     libzip-dev \
     supervisor \
-    gettext
+    gettext \
+    nodejs \
+    npm
 
 # PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg
@@ -32,35 +33,23 @@ WORKDIR /var/www/html
 # Copia projeto
 COPY . .
 
-# Instala dependências Laravel
+# Instala dependências PHP (produção)
 RUN composer install --no-dev --optimize-autoloader
 
-# 🔥 LIMPA CACHE (COLOQUE AQUI)
-RUN php artisan config:clear \
- && php artisan cache:clear \
- && php artisan route:clear \
- && php artisan view:clear
+# Instala dependências Node e builda assets front-end
+RUN npm ci --include=dev && npm run build && rm -rf node_modules
 
-# 🔥 Cria SQLite + permissões
+# Produção: cache de configuração
+RUN php artisan config:cache \
+ && php artisan route:cache \
+ && php artisan view:cache
+
+# Cria SQLite + permissões
 RUN mkdir -p database \
     && touch database/database.sqlite \
     && mkdir -p storage/framework/{sessions,views,cache,testing} storage/logs bootstrap/cache \
     && chmod -R 777 database storage bootstrap/cache
 
-# (opcional depois que tudo estiver ok)
-# RUN php artisan config:cache
-# RUN php artisan route:cache
+EXPOSE 9000
 
-
-# Configuração do Supervisor
-# COPY docker/supervisord.conf /etc/supervisord.conf
-
-# Porta Railway
-EXPOSE 8080
-
-# Configuração do Nginx
-# Criamos o diretório caso ele não exista
-# Removemos a cópia do nginx.conf, já que o serviço 'web' irá lidar com isso.
-
-# Ajuste o CMD para iniciar apenas o PHP-FPM
 CMD ["php-fpm"]
