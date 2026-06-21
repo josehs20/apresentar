@@ -36,9 +36,19 @@
             <span class="sidebar-text">Interações</span>
         </a>
 
+        <a href="{{ route('admin.pontos-venda.index') }}" class="sidebar-item {{ request()->routeIs('admin.pontos-venda.*') ? 'active' : '' }}">
+            <i class="bi bi-shop sidebar-icon"></i>
+            <span class="sidebar-text">Pontos de Venda</span>
+        </a>
+
         <a href="{{ route('admin.configuracoes.index') }}" class="sidebar-item {{ request()->routeIs('admin.configuracoes.*') ? 'active' : '' }}">
             <i class="bi bi-gear-fill sidebar-icon"></i>
             <span class="sidebar-text">Configurações</span>
+        </a>
+
+        <a href="{{ route('admin.configuracoes-cores.edit') }}" class="sidebar-item {{ request()->routeIs('admin.configuracoes-cores.*') ? 'active' : '' }}">
+            <i class="bi bi-palette sidebar-icon"></i>
+            <span class="sidebar-text">Cores do Site</span>
         </a>
 
         <a href="{{ route('admin.tipos-interacao.index') }}" class="sidebar-item {{ request()->routeIs('admin.tipos-interacao.*') ? 'active' : '' }}">

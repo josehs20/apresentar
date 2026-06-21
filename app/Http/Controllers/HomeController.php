@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ConfiguracaoSite;
+use App\Models\PontoVenda;
 use App\Models\Postagem;
 use App\Models\Produto;
 use Illuminate\View\View;
@@ -43,10 +44,12 @@ class HomeController extends Controller
         $contatoEmail    = $configuracoes['contato_email'] ?? null;
         $contatoEndereco = $configuracoes['contato_endereco'] ?? null;
         $instagramUrl    = $configuracoes['instagram_url'] ?? null;
+        $pontosVenda     = PontoVenda::ativos()->orderBy('nome')->take(6)->get();
 
         return view('home', compact(
             'destaques',
             'ultimosPosts',
+            'pontosVenda',
             'heroImagem',
             'heroTitulo',
             'heroSub',

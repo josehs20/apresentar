@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\ConfiguracaoCorController;
 use App\Http\Controllers\Admin\ConfiguracaoSiteController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\InteracaoController;
+use App\Http\Controllers\Admin\PontoVendaController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\TipoInteracaoController;
@@ -52,5 +54,16 @@ Route::prefix('admin')->middleware(['auth'])->name('admin.')->group(function () 
 
     // Configurações do Site
     Route::resource('configuracoes', ConfiguracaoSiteController::class);
+
+    // Cores do Sistema (único registro global)
+    Route::prefix('configuracoes-cores')->name('configuracoes-cores.')->group(function () {
+        Route::get('/', [ConfiguracaoCorController::class, 'edit'])->name('edit');
+        Route::put('/', [ConfiguracaoCorController::class, 'update'])->name('update');
+    });
+
+    // Pontos de Venda
+    Route::resource('pontos-venda', PontoVendaController::class)->parameters([
+        'pontos-venda' => 'pontoVenda',
+    ]);
 
 });

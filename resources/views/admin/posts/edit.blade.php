@@ -56,7 +56,7 @@
                     <x-form.textarea name="meta_descricao" label="Meta Descrição" rows="2" maxlength="160" value="{{ $post->meta_descricao }}" />
                 </div>
                 <div class="col-md-4">
-                    <x-form.input name="meta_imagem" label="Meta Imagem (URL)" value="{{ $post->meta_imagem }}" />
+                    <!-- <x-form.input name="meta_imagem" label="Meta Imagem (URL)" value="{{ $post->meta_imagem }}" /> -->
                 </div>
             </div>
 

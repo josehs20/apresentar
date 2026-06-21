@@ -13,14 +13,6 @@ class ImagemService
      */
     public static function processarUpload($request, string $inputName, $model, string $pastaDestino = 'produtos'): ?string
     {
-        Log::info('[ImagemService] Iniciando processarUpload', [
-            'hasFile' => $request->hasFile($inputName),
-            'inputName' => $inputName,
-            'model' => get_class($model),
-            'model_id' => $model->id,
-            'pasta' => $pastaDestino,
-        ]);
-   
         if (!$request->hasFile($inputName)) {
             Log::info('[ImagemService] Nenhum arquivo enviado para o campo: ' . $inputName);
             return $model->caminho_imagem;
@@ -28,15 +20,6 @@ class ImagemService
 
         $file = $request->file($inputName);
         
-        Log::info('[ImagemService] Arquivo recebido', [
-            'originalName' => $file->getClientOriginalName(),
-            'mime' => $file->getMimeType(),
-            'size' => $file->getSize(),
-            'error' => $file->getError(),
-            'isValid' => $file->isValid(),
-            'pathname' => $file->getPathname(),
-        ]);
-
         try {
             $disk = Storage::disk('public');
             
@@ -53,18 +36,18 @@ class ImagemService
                 }
             }
 
-            // Usa cópia direta do arquivo temporário (mais confiável)
-            $extension = $file->getClientOriginalExtension() ?: 'jpg';
-            $filename = time() . '_' . uniqid() . '.' . $extension;
+            // Converte qualquer formato (webp, png, gif, etc.) para JPG
+            $filename = time() . '_' . uniqid() . '.jpg';
             $relativePath = $pastaDestino . '/' . $filename;
             $fullPath = storage_path('app/public/' . $relativePath);
             $dir = dirname($fullPath);
 
-            Log::info('[ImagemService] Preparando cópia direta', [
+            Log::info('[ImagemService] Preparando conversão para JPG', [
                 'filename' => $filename,
                 'relativePath' => $relativePath,
                 'fullPath' => $fullPath,
                 'sourcePath' => $file->getPathname(),
+                'originalExtension' => $file->getClientOriginalExtension(),
             ]);
 
             if (!is_dir($dir)) {
@@ -72,14 +55,39 @@ class ImagemService
                 Log::info('[ImagemService] Diretório criado: ' . $dir);
             }
 
-            // Tenta mover primeiro (mais eficiente), senão copia
-            $moved = @rename($file->getPathname(), $fullPath);
-            if (!$moved) {
+            // Lê o conteúdo do upload e converte para JPG com GD
+            $imageContent = @file_get_contents($file->getPathname());
+            if ($imageContent === false) {
+                Log::error('[ImagemService] Não foi possível ler o arquivo temporário');
+                throw new \RuntimeException('Erro ao ler arquivo temporário');
+            }
+
+            $sourceImage = @imagecreatefromstring($imageContent);
+            if ($sourceImage !== false) {
+                // Cria fundo branco (essencial para PNG/GIF com transparência)
+                $jpgImage = imagecreatetruecolor(imagesx($sourceImage), imagesy($sourceImage));
+                $white = imagecolorallocate($jpgImage, 255, 255, 255);
+                imagefilledrectangle($jpgImage, 0, 0, imagesx($sourceImage), imagesy($sourceImage), $white);
+                imagecopy($jpgImage, $sourceImage, 0, 0, 0, 0, imagesx($sourceImage), imagesy($sourceImage));
+
+                // Salva como JPEG com qualidade 90
+                $saved = imagejpeg($jpgImage, $fullPath, 90);
+                imagedestroy($sourceImage);
+                imagedestroy($jpgImage);
+
+                if (!$saved) {
+                    Log::error('[ImagemService] Falha ao salvar imagem como JPEG');
+                    throw new \RuntimeException('Erro ao salvar JPEG');
+                }
+
+                Log::info('[ImagemService] Imagem convertida para JPG com sucesso');
+            } else {
+                // Fallback: se não for imagem reconhecível, copia como está
+                Log::warning('[ImagemService] Arquivo não é uma imagem válida, copiando como está');
                 $copied = copy($file->getPathname(), $fullPath);
-                Log::info('[ImagemService] rename falhou, tentando copy', ['copied' => $copied]);
                 if (!$copied) {
-                    Log::error('[ImagemService] Falha total: nem rename nem copy funcionaram');
-                    return null;
+                    Log::error('[ImagemService] Falha ao copiar arquivo não-imagem');
+                    throw new \RuntimeException('Erro ao copiar arquivo não-imagem');
                 }
             }
 
@@ -97,18 +105,13 @@ class ImagemService
 
             if (!$exists) {
                 Log::error('[ImagemService] Arquivo não existe após salvamento');
-                return null;
+                throw new \RuntimeException('Arquivo não existe após salvamento');
             }
 
             // Atualiza o model
             $model->caminho_imagem = $relativePath;
             $model->meta_imagem = $relativePath;
             $model->save();
-
-            Log::info('[ImagemService] Model atualizado com sucesso', [
-                'caminho_imagem' => $model->caminho_imagem,
-                'model_id' => $model->id,
-            ]);
 
             return $relativePath;
         } catch (\Exception $e) {
@@ -118,7 +121,7 @@ class ImagemService
                 'line' => $e->getLine(),
                 'trace' => $e->getTraceAsString(),
             ]);
-            return null;
+            throw $e; // Relança para que a transação em ProdutoService seja revertida
         }
     }
 }

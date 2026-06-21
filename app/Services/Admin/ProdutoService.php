@@ -32,7 +32,7 @@ class ProdutoService
         if (isset($filters['ativo'])) {
             $query->where('ativo', $filters['ativo']);
         }
-
+   
         return $query->paginate(10);
     }
 
@@ -41,10 +41,12 @@ class ProdutoService
         DB::beginTransaction();
         try {
             $data = $request->validated();
+            unset($data['imagem']); // Remove o arquivo do array de dados (não é coluna no banco)
             $produto = Produto::create($data);
 
             if ($request->hasFile('imagem')) {
-                ImagemService::processarUpload($request, 'imagem', $produto, 'produtos');
+                $relativePath = ImagemService::processarUpload($request, 'imagem', $produto, 'produtos');
+                Log::info('[ProdutoService] Upload processado na criação', ['path' => $relativePath]);
             }
 
             DB::commit();
@@ -60,6 +62,7 @@ class ProdutoService
         DB::beginTransaction();
         try {
             $data = $request->validated();
+            unset($data['imagem']); // Remove o arquivo do array de dados (não é coluna no banco)
             
             Log::info('[ProdutoService] Atualizando produto', [
                 'id' => $produto->id,
@@ -71,13 +74,12 @@ class ProdutoService
 
             if ($request->hasFile('imagem')) {
                 Log::info('[ProdutoService] Processando upload de imagem...');
-                ImagemService::processarUpload($request, 'imagem', $produto, 'produtos');
+                $relativePath = ImagemService::processarUpload($request, 'imagem', $produto, 'produtos');
+                Log::info('[ProdutoService] Upload processado na atualização', ['path' => $relativePath]);
             }
-
             DB::commit();
             return $produto->fresh('categoria');
         } catch (\Exception $e) {
-            dd($e); // Debug temporário para capturar detalhes do erro
             Log::error('[ProdutoService] Erro ao atualizar produto', [
                 'message' => $e->getMessage(),
                 'file' => $e->getFile(),

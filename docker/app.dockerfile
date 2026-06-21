@@ -63,4 +63,4 @@ EXPOSE 8080
 # Removemos a cópia do nginx.conf, já que o serviço 'web' irá lidar com isso.
 
 # Ajuste o CMD para iniciar apenas o PHP-FPM
-CMD php-fpm -D
+CMD ["php-fpm"]

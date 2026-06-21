@@ -4,6 +4,7 @@ use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InteracaoController;
+use App\Http\Controllers\PontoVendaController;
 use Illuminate\Support\Facades\Route;
 
 // Home
@@ -20,6 +21,9 @@ Route::prefix('blog')->name('blog.')->group(function () {
     Route::get('/', [BlogController::class, 'index'])->name('index');
     Route::get('/{slug}', [BlogController::class, 'show'])->name('show');
 });
+
+// Pontos de Venda
+Route::get('/onde-encontrar', [PontoVendaController::class, 'index'])->name('pontos-venda');
 
 // Interação (Tracking + Redirecionamento)
 Route::get('/interacao/{tipo}/{produto}', [InteracaoController::class, 'redirect'])

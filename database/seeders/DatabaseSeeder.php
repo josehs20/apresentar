@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             TipoInteracaoSeeder::class,
             CatalogoSeeder::class,
             ConfiguracaoSiteSeeder::class,
+            PontoVendaSeeder::class,
         ]);
     }
 }

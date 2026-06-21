@@ -160,7 +160,80 @@
     </div>
 </section>
 @endif
-
+{{-- PONTOS DE VENDA --}}
+@if(isset($pontosVenda) && $pontosVenda->count() > 0)
+<section style="padding:80px 0;background:var(--light);">
+    <div class="container">
+        <div class="text-center mb-5">
+            <p class="text-secondary-custom fw-semibold mb-2" style="font-size:13px;letter-spacing:0.05em;text-transform:uppercase;">Onde Encontrar</p>
+            <h2 class="fw-bold" style="font-size:2rem;color:var(--dark);">Nossos Pontos de Venda</h2>
+            <p class="text-muted" style="max-width:500px;margin:0 auto;">Encontre o ponto mais próximo de você</p>
+        </div>
+        <div class="row g-4">
+            @foreach($pontosVenda as $ponto)
+            <div class="col-md-6 col-lg-4">
+                <div class="blog-card" style="height:100%;">
+                    {{-- Mapa estático --}}
+                    <div class="card-img-wrapper" style="aspect-ratio:16/9;position:relative;">
+                        @if($ponto->latitude && $ponto->longitude)
+                        <iframe
+                            width="100%"
+                            height="100%"
+                            style="border:0;pointer-events:none;"
+                            loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade"
+                            src="https://www.google.com/maps?q={{ $ponto->latitude }},{{ $ponto->longitude }}&z=15&output=embed">
+                        </iframe>
+                        <div style="position:absolute;top:0;left:0;right:0;bottom:0;z-index:2;" onclick="window.open('https://www.google.com/maps?q={{ $ponto->latitude }},{{ $ponto->longitude }}','_blank')"></div>
+                        @else
+                        <div class="w-100 h-100 d-flex align-items-center justify-content-center" style="background:linear-gradient(135deg,var(--light),#EDE7DE);">
+                            <i class="bi bi-shop" style="font-size:48px;color:rgba(46,94,78,0.2);"></i>
+                        </div>
+                        @endif
+                    </div>
+                    <div class="p-4">
+                        <h5 class="fw-semibold text-dark mb-2">{{ $ponto->nome }}</h5>
+                        @if($ponto->endereco)
+                            <p class="text-muted small mb-2">
+                                <i class="bi bi-geo-alt me-1"></i>{{ $ponto->endereco }}
+                                @if($ponto->cidade || $ponto->estado)
+                                    <br><span class="ms-3">{{ $ponto->cidade }}{{ $ponto->cidade && $ponto->estado ? '/' : '' }}{{ $ponto->estado }}</span>
+                                @endif
+                            </p>
+                        @endif
+                        @if($ponto->horario_funcionamento)
+                            <p class="text-muted small mb-2"><i class="bi bi-clock me-1"></i>{{ $ponto->horario_funcionamento }}</p>
+                        @endif
+                        <div class="d-flex gap-2 mt-3 flex-wrap">
+                            @if($ponto->latitude && $ponto->longitude)
+                                <a href="https://www.google.com/maps?q={{ $ponto->latitude }},{{ $ponto->longitude }}" target="_blank" class="btn btn-sm rounded-pill" style="background:#ea4335;color:#fff;font-size:12px;padding:5px 14px;">
+                                    <i class="bi bi-google me-1"></i>Abrir no Maps
+                                </a>
+                            @elseif($ponto->google_maps_link)
+                                <a href="{{ $ponto->google_maps_link }}" target="_blank" class="btn btn-sm rounded-pill" style="background:#ea4335;color:#fff;font-size:12px;padding:5px 14px;">
+                                    <i class="bi bi-google me-1"></i>Abrir no Maps
+                                </a>
+                            @endif
+                            @if($ponto->whatsapp)
+                                <a href="{{ $ponto->whatsapp_link }}" target="_blank" class="btn btn-sm rounded-pill" style="background:#25D366;color:#fff;font-size:12px;padding:5px 14px;">
+                                    <i class="bi bi-whatsapp me-1"></i>WhatsApp
+                                </a>
+                            @endif
+                      
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+        <div class="text-center mt-5">
+            <a href="{{ route('pontos-venda') }}" class="btn-outline-custom">
+                Ver todos os pontos <i class="bi bi-arrow-right ms-2"></i>
+            </a>
+        </div>
+    </div>
+</section>
+@endif
 {{-- CONTATO --}}
 <section style="padding:80px 0;">
     <div class="container">
